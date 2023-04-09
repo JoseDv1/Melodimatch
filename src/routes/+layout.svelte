@@ -21,6 +21,8 @@
 			rgba(0, 110, 255, 1) 52%,
 			rgba(0, 132, 165, 1) 100%
 		);
+		background-size: 100%;
+		background-attachment: fixed;
 	}
 
 	@media (max-width: 769px) {
