@@ -11,7 +11,7 @@
 		}
 
 		if (session) {
-			window.location.href = '/profile';
+			window.location.href = '/feed';
 		}
 	});
 </script>

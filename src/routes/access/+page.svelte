@@ -1,11 +1,5 @@
 <script>
 	import AltLogin from '../../Components/AltLogin.svelte';
-
-	let isNewUser = true;
-
-	const SwapForm = () => {
-		isNewUser = !isNewUser;
-	};
 </script>
 
 <div class="login-page">
