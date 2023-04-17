@@ -7,7 +7,9 @@
 		getSpotifyAccessToken,
 		getRecommendations,
 		getMelodimatchPlaylist,
-		getMelodimatchPlaylistTracks
+		getMelodimatchPlaylistTracks,
+		addTracksToMelodimatchPlaylist,
+		getArtist
 	} from '../../services/spotify.js';
 	import { getUserSession } from '../../services/getUserSession.js';
 	import Loader from '../../Components/Loader.svelte';
@@ -15,9 +17,9 @@
 	import NextSvg from '../../Components/NextSVG.svelte';
 
 	// Dev States
-	let melodimatchPlaylist = {};
 
 	//  State variables
+	let melodimatchPlaylist = {};
 	let currentTrack = 0;
 	let savedTracks = {};
 	let recomendations = {};
@@ -31,6 +33,7 @@
 		name: ''
 	};
 	let spotifyUserId = '';
+	let accessToken = '';
 
 	// Handle the skip button
 	function handleSkip() {
@@ -39,16 +42,17 @@
 	}
 
 	// Handle the like button
-	function handleLike() {
+	async function handleLike() {
 		console.log('Like');
+		await addTracksToMelodimatchPlaylist(accessToken, melodimatchPlaylist, track);
+		handleSkip();
 	}
 
 	// On mount, get the user session, the access token, the saved tracks, the first track as the principal recomendation, the recomendations based on the principal recomendation and set the first recomendation as the current track
 	onMount(async () => {
 		// Get the user session and the access token
 		const session = await getUserSession();
-		console.log(session);
-		const accessToken = await getSpotifyAccessToken(session);
+		accessToken = await getSpotifyAccessToken(session);
 		spotifyUserId = session.user.user_metadata?.provider_id;
 
 		// Get the meloymatch playlist
@@ -62,17 +66,16 @@
 
 		// Get saved tracks
 		savedTracks = await getSavedTracks(accessToken);
+
 		// If melodimatch playlist is not empty, set the first track of the playlist as the principal recomendation
 		recomendationBaseTrack =
 			melodimatchPlaylistTracks.items.length > 0
-				? melodimatchPlaylistTracks.items[0].track
+				? melodimatchPlaylistTracks.items[melodimatchPlaylistTracks.items.length - 1].track
 				: savedTracks.items[0].track;
 
-		console.log(recomendationBaseTrack.name);
 		// Get recomendations based on the principal recomendation
 		recomendations = await getRecommendations(accessToken, recomendationBaseTrack);
 
-		console.log(recomendations);
 		// Set the first recomendation as the current track
 		track = recomendations.tracks[currentTrack];
 	});
