@@ -1,14 +1,23 @@
 <script>
+	//  Importing the functions from the services folder
 	import { onMount } from 'svelte';
 	import {
 		getSongEmbed,
 		getSavedTracks,
 		getSpotifyAccessToken,
-		getRecommendations
+		getRecommendations,
+		getMelodimatchPlaylist,
+		getMelodimatchPlaylistTracks
 	} from '../../services/spotify.js';
 	import { getUserSession } from '../../services/getUserSession.js';
 	import Loader from '../../Components/Loader.svelte';
+	import LikeSvg from '../../Components/LikeSVG.svelte';
+	import NextSvg from '../../Components/NextSVG.svelte';
 
+	// Dev States
+	let melodimatchPlaylist = {};
+
+	//  State variables
 	let currentTrack = 0;
 	let savedTracks = {};
 	let recomendations = {};
@@ -21,34 +30,52 @@
 		],
 		name: ''
 	};
+	let spotifyUserId = '';
 
+	// Handle the skip button
+	function handleSkip() {
+		currentTrack++;
+		track = recomendations.tracks[currentTrack];
+	}
+
+	// Handle the like button
+	function handleLike() {
+		console.log('Like');
+	}
+
+	// On mount, get the user session, the access token, the saved tracks, the first track as the principal recomendation, the recomendations based on the principal recomendation and set the first recomendation as the current track
 	onMount(async () => {
 		// Get the user session and the access token
 		const session = await getUserSession();
+		console.log(session);
 		const accessToken = await getSpotifyAccessToken(session);
+		spotifyUserId = session.user.user_metadata?.provider_id;
 
-		// Get saved tracks and set the first track as the principal recomendation
+		// Get the meloymatch playlist
+		melodimatchPlaylist = await getMelodimatchPlaylist(accessToken, spotifyUserId);
+
+		// Get the Melodimatch playlist tracks
+		const melodimatchPlaylistTracks = await getMelodimatchPlaylistTracks(
+			accessToken,
+			melodimatchPlaylist
+		);
+
+		// Get saved tracks
 		savedTracks = await getSavedTracks(accessToken);
-		recomendationBaseTrack = savedTracks.items[0].track;
+		// If melodimatch playlist is not empty, set the first track of the playlist as the principal recomendation
+		recomendationBaseTrack =
+			melodimatchPlaylistTracks.items.length > 0
+				? melodimatchPlaylistTracks.items[0].track
+				: savedTracks.items[0].track;
 
+		console.log(recomendationBaseTrack.name);
 		// Get recomendations based on the principal recomendation
 		recomendations = await getRecommendations(accessToken, recomendationBaseTrack);
 
+		console.log(recomendations);
 		// Set the first recomendation as the current track
 		track = recomendations.tracks[currentTrack];
 	});
-
-	// Update the current track when the currentTrack variable changes and the track is not undefined or 0 (the first track)
-	$: {
-		async function updateTrack() {
-			if (track == undefined) return;
-			if (currentTrack == 0) return;
-
-			track = recomendations.tracks[currentTrack];
-		}
-
-		updateTrack();
-	}
 </script>
 
 <div class="feed">
@@ -66,13 +93,8 @@
 		</div>
 	</div>
 	<div class="buttons">
-		<button on:click={() => {}}>X</button>
-		<button
-			on:click={() => {
-				currentTrack++;
-			}}>Skip</button
-		>
-		<button> Like </button>
+		<button on:click={handleLike} class="like"><LikeSvg /></button>
+		<button on:click={handleSkip} class="skip"> <NextSvg /></button>
 	</div>
 </div>
 
@@ -91,9 +113,8 @@
 		padding: 0 10%;
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
-		align-items: center;
 		gap: 1rem;
+		height: 50%;
 	}
 
 	.buttons {
@@ -103,18 +124,6 @@
 		gap: 1rem;
 		width: 100%;
 	}
-
-	.buttons button {
-		width: 100px;
-		height: 50px;
-		border: none;
-		border-radius: 1rem;
-	}
-
-	.buttons button:hover {
-		cursor: pointer;
-	}
-
 	.song {
 		display: flex;
 		align-items: center;
@@ -129,5 +138,18 @@
 		align-items: center;
 		justify-content: center;
 		text-align: center;
+	}
+
+	.buttons button {
+		height: 5rem;
+		aspect-ratio: 1/1;
+		border: none;
+		border-radius: 50%;
+		font-size: 1.5rem;
+		font-weight: 600;
+		cursor: pointer;
+		margin-top: 5rem;
+		display: grid;
+		place-items: center;
 	}
 </style>

@@ -2,18 +2,6 @@ import { supabase } from './client.js';
 
 export const auth = supabase.auth;
 
-// Crear un usuario
-export async function signUpWithEmail(email, password) {
-	const { data, error } = await auth.signUp({ email, password });
-	return { data, error };
-}
-
-// Iniciar sesión
-export async function signInWithEmail(email, password) {
-	const { data, error } = await auth.signInWithPassword({ email, password });
-	return { data, error };
-}
-
 // iniciar sesión con Spotify
 export async function signInWithSpotify() {
 	const { data, error } = await auth.signInWithOAuth({
