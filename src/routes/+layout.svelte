@@ -1,15 +1,21 @@
 <script>
+	import Header from '../Components/Header.svelte';
 	import './global.css';
 </script>
 
 <!-- Create a layout for a mobile view -->
 <div class="layout">
-	<slot />
+	<Header />
+	<main>
+		<slot />
+	</main>
 </div>
 
 <style>
 	.layout {
 		display: flex;
+		flex-direction: column;
+
 		min-height: 100dvh;
 		width: 500px;
 		box-shadow: 0 0 20px 0px black;
@@ -23,6 +29,14 @@
 		);
 		background-size: 100%;
 		background-attachment: fixed;
+	}
+
+	.layout main {
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
 	}
 
 	@media (max-width: 769px) {
