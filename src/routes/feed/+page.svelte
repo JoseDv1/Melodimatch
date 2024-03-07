@@ -8,8 +8,7 @@
 		getRecommendations,
 		getMelodimatchPlaylist,
 		getMelodimatchPlaylistTracks,
-		addTracksToMelodimatchPlaylist,
-		getArtist
+		addTracksToMelodimatchPlaylist
 	} from '../../services/spotify.js';
 	import { getUserSession } from '../../services/getUserSession.js';
 	import Loader from '../../Components/Loader.svelte';
@@ -18,7 +17,7 @@
 
 	// Dev States
 
-	//  State variables
+	//Variables
 	let melodimatchPlaylist = {};
 	let currentTrack = 0;
 	let savedTracks = {};

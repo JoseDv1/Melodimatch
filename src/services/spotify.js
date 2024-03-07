@@ -212,7 +212,6 @@ export async function getRecommendations(spotifyAccessToken, trackRef, limit = 1
 		const seedTracks = trackRef.id;
 		// RAndom Genre recommendation
 		const seedGenres = allGenres[Math.floor(Math.random() * allGenres.length)];
-		console.log(seedGenres);
 
 		const recommendationReq = await fetch(
 			`https://api.spotify.com/v1/recommendations?limit=${limit}&seed_artists=${seedArtists}&seed_genres=${seedGenres}&seed_tracks=${seedTracks}`,
